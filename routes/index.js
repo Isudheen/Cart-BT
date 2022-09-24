@@ -33,7 +33,7 @@ router.get('/', function (req, res, next) {
         'https://www.91-img.com/pictures/136139-v4-apple-iphone-12-mobile-phone-medium-1.jpg?tr=q-80',
     },
   ];
-  res.render('index', { products });
+  res.render('index', { products, admin: true });
 });
 
 module.exports = router;
