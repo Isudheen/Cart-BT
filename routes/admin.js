@@ -1,10 +1,15 @@
 var express = require('express');
-const productHelpers = require('../helpers/product-helpers');
 var router = express.Router();
-var productHelper = require('../helpers/product-helpers');
-
+const productHelper = require('../helpers/product-helpers');
+const userHelper = require('../helpers/user-helpers');
+const userControlHelper = require('../helpers/user-control-helpers');
+const adminAccountHelper = require('../helpers/admin-account-helpers');
 /* GET users listing. */
 router.get('/', function (req, res, next) {
+  let adminData = req.session.admin;
+  if (!adminData) {
+    res.render('admin/login', { admin: true });
+  }
   let products = [
     {
       name: 'OnePlus 9 Pro ',
@@ -53,4 +58,96 @@ router.post('/add-product', (req, res) => {
   });
 });
 
+router.get('/view-users', (req, res) => {
+  let adminData = req.session.admin;
+  if (!adminData) {
+    res.render('admin/login', { admin: true });
+  }
+  userControlHelper.getAllUsers().then((users) => {
+    console.log(users);
+    res.render('admin/view-users', { admin: true, users, adminData });
+  });
+});
+
+router.get('/add-user', (req, res) => {
+  res.render('admin/add-user');
+});
+
+router.post('/add-user', (req, res) => {
+  userHelper.doSignup(req.body).then((response) => {
+    console.log(response);
+    res.redirect('/admin/view-users');
+  });
+});
+
+router.get('/edit-user/:id', (req, res) => {
+  let userId = req.params.id;
+  userControlHelper.getUserDetails(userId).then((user) => {
+    res.render('admin/edit-user', { user });
+  });
+});
+
+router.post('/edit-user/:id', (req, res) => {
+  let id = req.params.id;
+  userControlHelper.updateUser(id, req.body).then(() => {
+    res.redirect('/admin/view-users');
+  });
+});
+
+router.get('/delete-user/:id', (req, res) => {
+  let userId = req.params.id;
+  console.log(userId);
+  userControlHelper.deleteUser(userId).then((response) => {
+    res.redirect('/admin');
+  });
+});
+
+router.post('/search-user', (req, res) => {
+  let adminData = req.session.admin;
+  let userName = req.body.Name;
+  console.log(userName);
+  userControlHelper.getUserByName(userName).then((user) => {
+    console.log(user);
+    res.render('admin/view-search', { admin: true, user, adminData });
+  });
+});
+
+router.get('/login', (req, res) => {
+  if (req.session.loggedIn) {
+    res.redirect('/admin');
+  } else {
+    res.render('admin/login', { admin: true, loginErr: req.session.loginErr });
+    req.session.loginErr = false;
+  }
+});
+
+router.get('/signup', (req, res) => {
+  res.render('admin/signup', { admin: true });
+});
+
+router.post('/signup', (req, res) => {
+  adminAccountHelper.adminSignup(req.body).then((response) => {
+    console.log(response);
+    res.redirect('/admin/login');
+  });
+});
+
+router.post('/login', (req, res) => {
+  adminAccountHelper.adminLogin(req.body).then((response) => {
+    if (response.status) {
+      req.session.loggedIn = true;
+      req.session.admin = response.admin;
+      console.log(req.session);
+      res.redirect('/admin');
+    } else {
+      req.session.loginErr = 'Invalid username or password';
+      res.redirect('/admin/login');
+    }
+  });
+});
+
+router.get('/logout', (req, res) => {
+  req.session.destroy();
+  res.redirect('/');
+});
 module.exports = router;

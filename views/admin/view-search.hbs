@@ -1,0 +1,56 @@
+<section>
+  <div class='container'>
+    <div class='row mt-4'>
+      <div class='d-flex justify-content-between'>
+        <a href='/admin/add-user' class='btn btn-success h-75'>Add User</a>
+        <form
+          action='/admin/search-user'
+          method='post'
+          class='d-flex'
+          role='search'
+        >
+          <input
+            class='form-control'
+            type='text'
+            name='Name'
+            placeholder='Search'
+            aria-label='Search'
+          />
+          <button class='btn btn-outline-success' type='submit'>Search</button>
+        </form>
+      </div>
+    </div>
+    {{#if user}}
+      <table class='table mt-5'>
+        <thead>
+          <tr>
+            <th scope='col'>No</th>
+            <th scope='col'>Name</th>
+            <th scope='col'>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope='row'>1</th>
+            <td>{{user.Name}}</td>
+            <td>{{user.Email}}</td>
+            <td>
+              <a
+                href='/admin/edit-user/{{user._id}}'
+                class='btn btn-primary'
+              >Edit</a>
+              <a
+                href='/admin/delete-user/{{user._id}}'
+                class='btn btn-danger'
+                onclick="return confirm('Do you want to delete {{user.Name}} ?')"
+              >Delete</a>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    {{else}}
+      <h3 class='text-danger'>No users in this name</h3>
+    {{/if}}
+
+  </div>
+</section>
