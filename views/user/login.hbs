@@ -24,6 +24,9 @@
         <a href='/signup'>Don't have an account?</a>
         <button type='submit' class='btn btn-primary float-right'>Login</button>
       </form>
+      {{#if loginErr}}
+        <p class='text-danger m-auto'>{{loginErr}}</p>
+      {{/if}}
     </div>
   </div>
 </div>

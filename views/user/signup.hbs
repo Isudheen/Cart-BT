@@ -36,6 +36,9 @@
           class='btn btn-primary float-right'
         >SignUp</button>
       </form>
+      {{#if err}}
+        <p class='text-danger m-auto'>{{err}}</p>
+      {{/if}}
     </div>
   </div>
 </div>

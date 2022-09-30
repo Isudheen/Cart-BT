@@ -5,13 +5,21 @@ const bcrypt = require('bcrypt');
 module.exports = {
   doSignup: (userData) => {
     return new Promise(async (resolve, reject) => {
-      userData.Password = await bcrypt.hash(userData.Password, 10);
-      db.get()
+      let user = await db
+        .get()
         .collection(collection.USER_COLLECTION)
-        .insertOne(userData)
-        .then((data) => {
-          resolve(data.insertedId);
-        });
+        .findOne({ Email: userData.Email });
+      if (!user) {
+        userData.Password = await bcrypt.hash(userData.Password, 10);
+        db.get()
+          .collection(collection.USER_COLLECTION)
+          .insertOne(userData)
+          .then((data) => {
+            resolve(data.insertedId);
+          });
+      } else {
+        reject('signup Failed, duplicate user');
+      }
     });
   },
   doLogin: (userData) => {

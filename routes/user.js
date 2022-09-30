@@ -59,10 +59,15 @@ router.get('/signup', (req, res) => {
 });
 
 router.post('/signup', (req, res) => {
-  userHelpers.doSignup(req.body).then((response) => {
-    console.log(response);
-    res.redirect('/login');
-  });
+  userHelpers
+    .doSignup(req.body)
+    .then((response) => {
+      console.log(response);
+      res.redirect('/login');
+    })
+    .catch((err) => {
+      res.render('user/signup', { err });
+    });
 });
 
 router.post('/login', (req, res) => {
